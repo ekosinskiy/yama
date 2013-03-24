@@ -17,6 +17,31 @@ class MongoWrapper {
         return $result['databases'];
     }
 
+    function humanViewSize($bytes){
+        $precision = 2;
+        $kilobyte = 1024;
+        $megabyte = $kilobyte * 1024;
+        $gigabyte = $megabyte * 1024;
+        $terabyte = $gigabyte * 1024;
+        if (($bytes >= 0) && ($bytes < $kilobyte)) {
+            return $bytes . ' B';
+
+        } elseif (($bytes >= $kilobyte) && ($bytes < $megabyte)) {
+            return round($bytes / $kilobyte, $precision) . ' KB';
+
+        } elseif (($bytes >= $megabyte) && ($bytes < $gigabyte)) {
+            return round($bytes / $megabyte, $precision) . ' MB';
+
+        } elseif (($bytes >= $gigabyte) && ($bytes < $terabyte)) {
+            return round($bytes / $gigabyte, $precision) . ' GB';
+
+        } elseif ($bytes >= $terabyte) {
+            return round($bytes / $terabyte, $precision) . ' TB';
+        } else {
+            return $bytes . ' B';
+        }
+    }
+
     function getCollectionList($dbname){
         $db = $this->mongo->$dbname;
         $list = $db->listCollections();
@@ -27,6 +52,21 @@ class MongoWrapper {
             $collection_list[] = array("name"=>$coll_name,"count"=>$coll_cunt);
         }
         return $collection_list;
+    }
+
+    function loadData($dbname, $collection, $limit=100){
+        if(!empty($collection) && !empty($dbname)){
+            $collection         = filter_var($collection, FILTER_SANITIZE_STRING);
+            $db_name            = filter_var($dbname, FILTER_SANITIZE_STRING);
+            $limit              = filter_var($limit, FILTER_SANITIZE_NUMBER_INT);
+
+            $db = $this->mongo->$db_name;
+            $coll = $db->$collection;;
+            return $coll->find();
+
+
+        }
+        return false;
     }
 
     /**
@@ -94,4 +134,19 @@ class MongoWrapper {
         }
         return 0;
     }
+
+    function remove_object($post){
+        if(!empty($post['collection']) && !empty($post['db']) && !empty($post['mongo_id'])){
+            $collection  = filter_var($post['collection'], FILTER_SANITIZE_STRING);
+            $db_name            = filter_var($post['db'], FILTER_SANITIZE_STRING);
+            $mongo_id  = filter_var($post['mongo_id'], FILTER_SANITIZE_STRING);
+            $db = $this->mongo->$db_name;
+            $c_collection = $db->$collection;
+            $res = $c_collection->remove(array("_id"=>new MongoId($mongo_id)));
+            return 1;
+        }
+        return 0;
+    }
+
+
 }

@@ -41,6 +41,34 @@ function showCreateCollectionWindows(dbname){
     }
 }
 
+function removeObject(dbname, collection, mongo_id){
+    if(mongo_id!="" && dbname!="" && collection!=""){
+        $('#confirmWindow').modal('show');
+        $('#btn_ok').unbind('click');
+        $('#btn_ok').on('click', function(){
+            $.ajax({
+                type:"post",
+                url: '/?cmd=remove_object',
+                data: { db: dbname, collection:collection, mongo_id: mongo_id},
+                success: function(data) {
+                    if(data=='1'){
+                        console.log(parseInt($('#ccnt_'+collection).html())-1);
+                        $('#ccnt_'+collection).html( parseInt($('#ccnt_'+collection).html())-1 );
+                        $('#mongoid_'+mongo_id).remove();
+                    }
+                    $('#confirmWindow').modal('hide');
+                }
+            });
+        });
+    }
+}
+
+function editObject(dbname, collection, mongo_id){
+    if(mongo_id!="" && dbname!="" && collection!=""){
+
+    }
+}
+
 function dropDatabase(dbname){
     if(dbname!=""){
         $('#confirmWindow').modal('show');

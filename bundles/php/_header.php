@@ -62,7 +62,7 @@
                             </a>
                             <ul id="database_list" class="dropdown-menu">
                                 <?php foreach($DB_LIST as $c_db):?>
-                                    <li><a href="/?dbname=<?php echo $c_db['name']?>"><?php echo $c_db['name']?>&nbsp;[<?php echo $c_db['empty']==1?"empty":$c_db['sizeOnDisk']?>]</a></li>
+                                    <li><a href="/?dbname=<?php echo $c_db['name']?>"><?php echo $c_db['name']?>&nbsp;[<?php echo $c_db['empty']==1?"empty":$mdb_driver->humanViewSize($c_db['sizeOnDisk'])?>]</a></li>
                                 <?php endforeach;?>
                             </ul>
                         </div>
@@ -94,7 +94,7 @@
                     <li class="dropdown">
                         <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
                             <?php if(!empty($_GET['collection'])):
-                                echo $_GET['collection'];
+                                echo $_GET['collection']."&nbsp[<span id=\"c_coll_cnt\"></span>]";
                             else:
                             ?>
                                 Select collection
@@ -103,14 +103,16 @@
                         </a>
                         <ul id="collection_list" class="dropdown-menu">
                             <?php foreach($COLLECTION_LIST as $collection):?>
-                                <li><a href="/?<?php echo "dbname=".$C_DB_NAME."&collection=".$collection['name']?>"><?php echo $collection['name']?> &nbsp;[<?php echo $collection['count']?>]</a></li>
+                                <li><a href="/?<?php echo "dbname=".$C_DB_NAME."&collection=".$collection['name']?>"><?php echo $collection['name']?> &nbsp;[<span id="ccnt_<?php echo $collection['name']?>"><?php echo $collection['count']?></span>]</a></li>
                             <?php endforeach;?>
 
                         </ul>
                     </li>
                     <li><a href="javascript:void(0)" onclick="showCreateCollectionWindows('<?php echo !empty($_GET['dbname'])?$_GET['dbname']:""?>');">Create collection</a></li>
                     <li><a href="javascript:void(0)" onclick="dropCollection('<?php echo !empty($_GET['dbname'])?$_GET['dbname']:""?>','<?php echo !empty($_GET['collection'])?$_GET['collection']:""?>')">Drop collection</a></li>
-
+                    <li><a href="javascript:void(0)">Show indexes</a></li>
+                    <li><a href="javascript:void(0)">Search</a></li>
+                    <li><a href="javascript:void(0)">Insert new object</a></li>
                 </ul>
 
                 <!-- Everything you want hidden at 940px or less, place within here -->
@@ -122,10 +124,30 @@
         </div>
     </div>
 
-    <div class="container">
-        1231231
+    <div id="object_list" class="container">
+    <?php if(!empty($COLL_EL)):?>
+            <?php
+            foreach($COLL_EL as $c_el):?>
+                <div class="row-fluid" id="mongoid_<?php echo $c_el['_id']?>">
+                    <div>
+                        <a href="javascript:void(0)" onclick="editObject('<?php echo !empty($_GET['dbname'])?$_GET['dbname']:""?>','<?php echo !empty($_GET['collection'])?$_GET['collection']:""?>','<?php echo $c_el['_id']?>');" class="icon-pencil"></a>
+                        &nbsp;
+                        <a href="javascript:void(0)" onclick="removeObject('<?php echo !empty($_GET['dbname'])?$_GET['dbname']:""?>','<?php echo !empty($_GET['collection'])?$_GET['collection']:""?>','<?php echo $c_el['_id']?>');" class="icon-remove"></a>
+                        &nbsp;
+                        <span><?php echo $c_el['_id']; unset($c_el['_id']);?></span>
+                    </div>
+                    <div>
+                        <pre><?php print_r($c_el);?></pre>
+                    </div>
 
+                </div>
+            <?php endforeach;?>
+
+    <?php endif;?>
     </div>
+
+
+
 
 
 </div> <!-- /container -->

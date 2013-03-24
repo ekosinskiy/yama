@@ -18,6 +18,10 @@ if(!empty($_GET['dbname'])){
     $COLLECTION_LIST = $mdb_driver->getCollectionList($dbname);
 }
 
+if(!empty($_GET['dbname']) && !empty($_GET['collection'])){
+    $COLL_EL = $mdb_driver->loadData($_GET['dbname'], $_GET['collection']);
+}
+
 
 if(!empty($_GET['cmd'])){
     $cmd = filter_var($_GET['cmd'], FILTER_SANITIZE_STRING);
